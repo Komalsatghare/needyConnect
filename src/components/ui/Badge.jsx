@@ -1,0 +1,23 @@
+import React from "react"
+import { cn } from "../../lib/utils"
+
+function Badge({ className, variant = "default", ...props }) {
+    return (
+        <div
+            className={cn(
+                "inline-flex items-center justify-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                {
+                    "border-transparent bg-primary-100 text-primary-800": variant === "default",
+                    "border-transparent bg-secondary-100 text-secondary-800": variant === "destructive",
+                    "border-transparent bg-amber-100 text-amber-800": variant === "warning",
+                    "border-transparent bg-emerald-100 text-emerald-800": variant === "success",
+                    "text-foreground": variant === "outline",
+                },
+                className
+            )}
+            {...props}
+        />
+    )
+}
+
+export { Badge }
