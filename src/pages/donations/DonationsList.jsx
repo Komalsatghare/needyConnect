@@ -30,7 +30,7 @@ export default function DonationsList() {
 
     const filteredDonations = useMemo(() => {
         return donations.filter(don => {
-            const matchesSearch = don.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            const matchesSearch = don.itemName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 don.description.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesCategory = categoryFilter === 'All' || don.category === categoryFilter;
             return matchesSearch && matchesCategory;
@@ -83,7 +83,7 @@ export default function DonationsList() {
                         <ItemCard
                             key={don._id}
                             id={don._id}
-                            title={don.title}
+                            title={don.itemName}
                             category={don.category}
                             description={don.description}
                             location={don.location}

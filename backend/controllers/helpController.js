@@ -1,5 +1,6 @@
 import HelpConnection from '../models/HelpConnection.js';
 import Request from '../models/Request.js';
+import Chat from '../models/Chat.js';
 
 // @desc    Accept a help request
 // @route   POST /api/help/accept
@@ -38,13 +39,35 @@ export const acceptHelpRequest = async (req, res, next) => {
 
         await helpConnection.save();
 
-        // Optionally update the Request status
+        // Update request status to accepted
         if (request.status === 'pending') {
             request.status = 'accepted';
             await request.save();
         }
 
-        res.status(201).json(helpConnection);
+        // Create a chat room between the helper and the needy user
+        const chat = new Chat({
+            requestId,
+            helperId: req.user._id,
+            needyUserId: request.createdBy,
+        });
+        const savedChat = await chat.save();
+
+        // Emit real-time notification to the needy user's personal socket room
+        const io = req.app.get('io');
+        if (io) {
+            io.to(request.createdBy.toString()).emit('request_accepted', {
+                chatId: savedChat._id,
+                message: 'Your request has been accepted.',
+                helperName: req.user.name,
+                requestTitle: request.title,
+            });
+        }
+
+        res.status(201).json({
+            helpConnection,
+            chatId: savedChat._id,
+        });
     } catch (error) {
         next(error);
     }

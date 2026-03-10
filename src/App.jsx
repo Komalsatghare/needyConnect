@@ -9,7 +9,10 @@ import PostRequest from './pages/requests/PostRequest';
 import RequestDetail from './pages/requests/RequestDetail';
 import DonationsList from './pages/donations/DonationsList';
 import OfferDonation from './pages/donations/OfferDonation';
+import DonationDetail from './pages/donations/DonationDetail';
 import Profile from './pages/Profile';
+import Chat from './pages/chat/Chat';
+import MyChats from './pages/chat/MyChats';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 
 function App() {
@@ -31,6 +34,11 @@ function App() {
 
           <Route path="donations" element={<DonationsList />} />
           <Route path="donations/new" element={<ProtectedRoute><OfferDonation /></ProtectedRoute>} />
+          <Route path="donations/:id" element={<DonationDetail />} />
+
+          {/* Chat routes */}
+          <Route path="chat/:chatId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+          <Route path="my-chats" element={<ProtectedRoute><MyChats /></ProtectedRoute>} />
         </Route>
       </Routes>
     </Router>

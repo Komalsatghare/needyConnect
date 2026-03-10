@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { LogOut, LayoutDashboard, User } from 'lucide-react';
+import { LogOut, LayoutDashboard, User, MessageSquare } from 'lucide-react';
 
 export default function Navbar() {
     const { user, logout } = useAuth();
@@ -32,6 +32,13 @@ export default function Navbar() {
                             >
                                 <LayoutDashboard className="h-4 w-4" />
                                 Dashboard
+                            </Link>
+                            <Link
+                                to="/my-chats"
+                                className="flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-primary-600 transition-colors"
+                            >
+                                <MessageSquare className="h-4 w-4" />
+                                Messages
                             </Link>
                             <Link
                                 to="/profile"

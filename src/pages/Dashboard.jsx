@@ -47,6 +47,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
+            {/* Stats */}
             <div className="grid gap-6 md:grid-cols-3 mb-8">
                 <Card className="bg-primary-50/50 border-primary-100 shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -85,9 +86,18 @@ export default function Dashboard() {
                 </Card>
             </div>
 
+            {/* My Requests */}
             <Card>
                 <CardHeader>
-                    <CardTitle>My Requests</CardTitle>
+                    <div className="flex items-center justify-between">
+                        <CardTitle>My Requests</CardTitle>
+                        <Link
+                            to="/my-chats"
+                            className="text-sm text-primary-600 hover:underline flex items-center gap-1"
+                        >
+                            View My Chats →
+                        </Link>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     {loading ? (
@@ -115,10 +125,11 @@ export default function Dashboard() {
                                             {req.category} • {req.location}
                                         </p>
                                     </div>
-                                    <span className={`text-xs font-medium px-2 py-1 rounded-full capitalize shrink-0 ${req.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                            req.status === 'accepted' ? 'bg-green-100 text-green-700' :
-                                                'bg-slate-100 text-slate-600'
-                                        }`}>
+                                    <span className={`text-xs font-medium px-2 py-1 rounded-full capitalize shrink-0 ${
+                                        req.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                                        req.status === 'accepted' ? 'bg-green-100 text-green-700' :
+                                        'bg-slate-100 text-slate-600'
+                                    }`}>
                                         {req.status}
                                     </span>
                                 </div>

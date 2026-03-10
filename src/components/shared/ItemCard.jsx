@@ -50,7 +50,10 @@ export default function ItemCard({
         <>
             {showModal && <AuthPromptModal onClose={() => setShowModal(false)} />}
             <Card className="flex flex-col h-full hover:shadow-md transition-shadow group">
-                <CardHeader className="pb-4">
+                <CardHeader
+                    className="pb-4 cursor-pointer"
+                    onClick={handleActionClick}
+                >
                     <div className="flex justify-between items-start gap-4">
                         <CardTitle className="line-clamp-1 group-hover:text-primary-600 transition-colors">
                             {title}
@@ -63,7 +66,7 @@ export default function ItemCard({
                     </CardDescription>
                 </CardHeader>
 
-                <CardContent className="flex-grow">
+                <CardContent className="flex-grow cursor-pointer" onClick={handleActionClick}>
                     <p className="text-sm text-slate-600 line-clamp-3 mb-4">{description}</p>
                     <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-auto">
                         <MapPin className="h-3.5 w-3.5" />
