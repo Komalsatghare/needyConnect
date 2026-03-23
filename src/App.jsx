@@ -7,12 +7,16 @@ import Dashboard from './pages/Dashboard';
 import RequestsList from './pages/requests/RequestsList';
 import PostRequest from './pages/requests/PostRequest';
 import RequestDetail from './pages/requests/RequestDetail';
+import EditRequest from './pages/requests/EditRequest';
 import DonationsList from './pages/donations/DonationsList';
 import OfferDonation from './pages/donations/OfferDonation';
 import DonationDetail from './pages/donations/DonationDetail';
+import EditDonation from './pages/donations/EditDonation';
 import Profile from './pages/Profile';
 import Chat from './pages/chat/Chat';
 import MyChats from './pages/chat/MyChats';
+import MapView from './pages/MapView';
+import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 
 function App() {
@@ -27,14 +31,18 @@ function App() {
           {/* Protected routes */}
           <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="map" element={<MapView />} />
+          <Route path="admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
 
           <Route path="requests" element={<RequestsList />} />
           <Route path="requests/new" element={<ProtectedRoute><PostRequest /></ProtectedRoute>} />
           <Route path="requests/:id" element={<RequestDetail />} />
+          <Route path="requests/edit/:id" element={<ProtectedRoute><EditRequest /></ProtectedRoute>} />
 
           <Route path="donations" element={<DonationsList />} />
           <Route path="donations/new" element={<ProtectedRoute><OfferDonation /></ProtectedRoute>} />
           <Route path="donations/:id" element={<DonationDetail />} />
+          <Route path="donations/edit/:id" element={<ProtectedRoute><EditDonation /></ProtectedRoute>} />
 
           {/* Chat routes */}
           <Route path="chat/:chatId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />

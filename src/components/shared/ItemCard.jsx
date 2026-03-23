@@ -6,6 +6,7 @@ import { Button } from '../ui/Button';
 import { MapPin } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import AuthPromptModal from './AuthPromptModal';
+import TrustBadge from './TrustBadge';
 
 export default function ItemCard({
     id,
@@ -15,14 +16,17 @@ export default function ItemCard({
     location,
     status,
     type = 'request',
-    quantity
+    quantity,
+    distance,
+    isVerified,
+    trustScore,
 }) {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
 
     const getStatusBadge = (status) => {
-        switch (status.toLowerCase()) {
+        switch (status?.toLowerCase()) {
             case 'pending': return <Badge variant="warning">Pending</Badge>;
             case 'accepted': return <Badge variant="success">Accepted</Badge>;
             case 'completed': return <Badge variant="default">Completed</Badge>;
@@ -60,17 +64,32 @@ export default function ItemCard({
                         </CardTitle>
                         {status && getStatusBadge(status)}
                     </div>
-                    <CardDescription className="flex items-center gap-2 mt-2">
+                    <CardDescription className="flex items-center gap-2 mt-2 flex-wrap">
                         {getCategoryBadge(category)}
                         {quantity && <span className="text-xs font-medium text-slate-500">Qty: {quantity}</span>}
                     </CardDescription>
                 </CardHeader>
 
                 <CardContent className="flex-grow cursor-pointer" onClick={handleActionClick}>
-                    <p className="text-sm text-slate-600 line-clamp-3 mb-4">{description}</p>
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-auto">
-                        <MapPin className="h-3.5 w-3.5" />
-                        <span className="truncate">{location}</span>
+                    <p className="text-sm text-slate-600 line-clamp-3 mb-3">{description}</p>
+
+                    {/* Trust info */}
+                    {(isVerified !== undefined || trustScore !== undefined) && (
+                        <div className="mb-3">
+                            <TrustBadge isVerified={isVerified} trustScore={trustScore} size="sm" />
+                        </div>
+                    )}
+
+                    <div className="flex items-center justify-between mt-auto">
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                            <MapPin className="h-3.5 w-3.5" />
+                            <span className="truncate max-w-[140px]">{location}</span>
+                        </div>
+                        {distance && (
+                            <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                                {distance} km
+                            </span>
+                        )}
                     </div>
                 </CardContent>
 

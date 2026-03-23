@@ -6,12 +6,14 @@ import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Select } from '../../components/ui/Select';
 import { mockCategories } from '../../services/mockData';
+import LocationPicker from '../../components/shared/LocationPicker';
 import api from '../../services/api';
 
 export default function PostRequest() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [coordinates, setCoordinates] = useState(null); // [lng, lat] from map picker
     const [formData, setFormData] = useState({
         title: '',
         category: '',
@@ -23,12 +25,25 @@ export default function PostRequest() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    // Called by LocationPicker with (readableAddress, [lng, lat])
+    const handleLocationChange = (address, coords) => {
+        setFormData((prev) => ({ ...prev, location: address }));
+        if (coords) setCoordinates(coords);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
         try {
-            await api.post('/requests/create', formData);
+            const payload = {
+                title: formData.title,
+                category: formData.category,
+                description: formData.description,
+                location: formData.location,
+                coordinates: coordinates || undefined,
+            };
+            await api.post('/requests/create', payload);
             navigate('/requests');
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to post request. Please try again.');
@@ -88,12 +103,11 @@ export default function PostRequest() {
 
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Location / Area <span className="text-secondary-600">*</span></label>
-                            <Input
-                                name="location"
-                                placeholder="e.g. Downtown near Central Park"
-                                required
+                            <LocationPicker
                                 value={formData.location}
-                                onChange={handleChange}
+                                onChange={handleLocationChange}
+                                required
+                                placeholder="e.g. Downtown near Central Park"
                             />
                         </div>
                     </CardContent>

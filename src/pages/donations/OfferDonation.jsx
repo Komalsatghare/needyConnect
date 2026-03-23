@@ -6,12 +6,14 @@ import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Select } from '../../components/ui/Select';
 import { mockCategories } from '../../services/mockData';
+import LocationPicker from '../../components/shared/LocationPicker';
 import api from '../../services/api';
 
 export default function OfferDonation() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [coordinates, setCoordinates] = useState(null); // [lng, lat]
     const [formData, setFormData] = useState({
         itemName: '',
         category: '',
@@ -24,6 +26,12 @@ export default function OfferDonation() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    // Called by LocationPicker with (readableAddress, [lng, lat])
+    const handleLocationChange = (address, coords) => {
+        setFormData((prev) => ({ ...prev, location: address }));
+        if (coords) setCoordinates(coords);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -32,6 +40,7 @@ export default function OfferDonation() {
             await api.post('/donations/create', {
                 ...formData,
                 quantity: Number(formData.quantity),
+                coordinates: coordinates || undefined,
             });
             navigate('/donations');
         } catch (err) {
@@ -40,6 +49,7 @@ export default function OfferDonation() {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-3xl">
@@ -105,12 +115,11 @@ export default function OfferDonation() {
 
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Pickup Location <span className="text-secondary-600">*</span></label>
-                            <Input
-                                name="location"
-                                placeholder="e.g. Westside Community Center Lobby"
-                                required
+                            <LocationPicker
                                 value={formData.location}
-                                onChange={handleChange}
+                                onChange={handleLocationChange}
+                                required
+                                placeholder="e.g. Westside Community Center Lobby"
                             />
                         </div>
                     </CardContent>

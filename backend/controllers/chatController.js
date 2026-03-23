@@ -16,6 +16,7 @@ export const getMyChats = async (req, res, next) => {
             .populate('helperId', 'name email')
             .populate('needyUserId', 'name email')
             .populate('requestId', 'title status')
+            .populate('donationId', 'itemName status')
             .sort({ updatedAt: -1 });
 
         // Attach the last message to each chat for preview
@@ -42,7 +43,8 @@ export const getChatById = async (req, res, next) => {
         const chat = await Chat.findById(req.params.chatId)
             .populate('helperId', 'name email')
             .populate('needyUserId', 'name email')
-            .populate('requestId', 'title');
+            .populate('requestId', 'title')
+            .populate('donationId', 'itemName');
 
         if (!chat) {
             res.status(404);

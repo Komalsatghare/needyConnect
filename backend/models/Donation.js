@@ -28,6 +28,28 @@ const donationSchema = new mongoose.Schema(
             required: false,
             default: '',
         },
+        // GeoJSON Point for geospatial queries (optional)
+        coordinates: {
+            type: {
+                type: String,
+                enum: ['Point'],
+                // No default — keeps the whole field undefined when not provided
+            },
+            coordinates: {
+                type: [Number], // [longitude, latitude]
+            },
+        },
+        // Donation lifecycle status
+        lifecycleStatus: {
+            type: String,
+            enum: ['posted', 'requested', 'accepted', 'delivered', 'completed'],
+            default: 'posted',
+        },
+        requestedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null,
+        },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
@@ -38,6 +60,9 @@ const donationSchema = new mongoose.Schema(
         timestamps: true,
     }
 );
+
+// sparse: true — skips documents where coordinates is null/undefined
+donationSchema.index({ coordinates: '2dsphere' }, { sparse: true });
 
 const Donation = mongoose.model('Donation', donationSchema);
 export default Donation;

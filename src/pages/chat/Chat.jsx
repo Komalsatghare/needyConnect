@@ -214,9 +214,9 @@ export default function Chat() {
                     <p style={{ margin: 0, fontWeight: 600, fontSize: 16, color: '#e9edef', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {otherUser?.name || 'User'}
                     </p>
-                    {chat?.requestId?.title && (
+                    {(chat?.requestId?.title || chat?.donationId?.itemName) && (
                         <p style={{ margin: 0, fontSize: 12, color: '#8696a0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            Re: {chat.requestId.title}
+                            Re: {chat?.requestId?.title || chat?.donationId?.itemName}
                         </p>
                     )}
                 </div>

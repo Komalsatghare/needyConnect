@@ -11,6 +11,9 @@ import requestRoutes from './routes/requestRoutes.js';
 import donationRoutes from './routes/donationRoutes.js';
 import helpRoutes from './routes/helpRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
+import reportRoutes from './routes/reportRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 import User from './models/User.js';
 
 dotenv.config();
@@ -20,17 +23,27 @@ connectDB();
 const app = express();
 const httpServer = createServer(app);
 
+const ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:5173',
+];
+
 const io = new Server(httpServer, {
     cors: {
-        origin: '*',
+        origin: ALLOWED_ORIGINS,
         methods: ['GET', 'POST'],
+        credentials: true,
     },
 });
 
 // Make io accessible in controllers via req.app.get('io')
 app.set('io', io);
 
-app.use(cors());
+app.use(cors({
+    origin: ALLOWED_ORIGINS,
+    credentials: true,
+}));
 app.use(express.json());
 
 // Socket.io authentication middleware
@@ -81,6 +94,9 @@ app.use('/api/requests', requestRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/help', helpRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

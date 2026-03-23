@@ -19,6 +19,8 @@ export default function RequestDetail() {
     const [error, setError] = useState('');
     const [accepting, setAccepting] = useState(false);
     const [acceptError, setAcceptError] = useState('');
+    // chatId for a helper who has already accepted this request
+    const [existingChatId, setExistingChatId] = useState(null);
 
     // Notification for needy user: shown when their request gets accepted
     const [notification, setNotification] = useState(null);
@@ -28,7 +30,7 @@ export default function RequestDetail() {
             try {
                 const { data } = await api.get(`/requests/${id}`);
                 setRequest(data);
-            } catch (err) {
+            } catch {
                 setError('Request not found or failed to load.');
             } finally {
                 setLoading(false);
@@ -36,6 +38,23 @@ export default function RequestDetail() {
         };
         fetchRequest();
     }, [id]);
+
+    // For helpers: check if they already have a chat for this request
+    useEffect(() => {
+        if (!user) return;
+        const findExistingChat = async () => {
+            try {
+                const { data: chats } = await api.get('/chat/my-chats');
+                const match = chats.find(
+                    (c) => (c.requestId?._id || c.requestId)?.toString() === id
+                );
+                if (match) setExistingChatId(match._id);
+            } catch {
+                // not critical — ignore errors
+            }
+        };
+        findExistingChat();
+    }, [user, id]);
 
     // Listen for real-time acceptance notification (for the needy user)
     useEffect(() => {
@@ -79,6 +98,19 @@ export default function RequestDetail() {
 
     const isOwner = user && request && (request.createdBy._id || request.createdBy).toString() === user._id?.toString();
     const isAccepted = request?.status === 'accepted' || request?.status === 'completed';
+
+    const getLifecycleIndex = (status) => {
+        switch (status?.toLowerCase()) {
+            case 'pending':
+                return 0; // Requested
+            case 'accepted':
+                return 2; // Processing
+            case 'completed':
+                return 3; // Delivered
+            default:
+                return 0;
+        }
+    };
 
     if (loading) {
         return (
@@ -162,6 +194,41 @@ export default function RequestDetail() {
                             </div>
                         </CardHeader>
                         <CardContent className="pt-6 prose prose-slate">
+                            <div className="mb-6">
+                                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">
+                                    Request Progress
+                                </p>
+                                <div className="relative flex items-center justify-between">
+                                    <div className="absolute left-3 right-3 h-px bg-slate-200" />
+                                    {['Requested', 'Accepted', 'Processing', 'Delivered'].map((label, idx) => {
+                                        const currentIdx = getLifecycleIndex(request.status);
+                                        const isDone = idx < currentIdx;
+                                        const isCurrent = idx === currentIdx;
+                                        return (
+                                            <div key={label} className="relative z-10 flex flex-col items-center flex-1">
+                                                <div
+                                                    className={[
+                                                        'w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold',
+                                                        isDone || isCurrent
+                                                            ? 'bg-green-500 text-white'
+                                                            : 'bg-slate-100 text-slate-400 border border-slate-200',
+                                                    ].join(' ')}
+                                                >
+                                                    {idx + 1}
+                                                </div>
+                                                <p
+                                                    className={[
+                                                        'mt-2 text-[10px] font-medium text-center',
+                                                        isDone || isCurrent ? 'text-green-700' : 'text-slate-400',
+                                                    ].join(' ')}
+                                                >
+                                                    {label}
+                                                </p>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
                             <h3 className="text-lg font-semibold text-slate-900 mb-2">Description</h3>
                             <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
                                 {request.description}
@@ -193,24 +260,36 @@ export default function RequestDetail() {
                                             <p className="text-sm text-red-700">{acceptError}</p>
                                         </div>
                                     )}
-                                    <Button
-                                        className="w-full flex items-center gap-2"
-                                        size="lg"
-                                        onClick={handleAccept}
-                                        disabled={accepting || isAccepted}
-                                    >
-                                        {accepting ? (
-                                            <>
-                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                Accepting...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <MessageSquare className="h-4 w-4" />
-                                                {isAccepted ? 'Already Accepted' : 'Accept & Chat'}
-                                            </>
-                                        )}
-                                    </Button>
+                                    {existingChatId ? (
+                                        // Helper already accepted — show Open Chat button
+                                        <Button
+                                            className="w-full flex items-center gap-2"
+                                            size="lg"
+                                            onClick={() => navigate(`/chat/${existingChatId}`)}
+                                        >
+                                            <MessageSquare className="h-4 w-4" />
+                                            Open Chat
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            className="w-full flex items-center gap-2"
+                                            size="lg"
+                                            onClick={handleAccept}
+                                            disabled={accepting || isAccepted}
+                                        >
+                                            {accepting ? (
+                                                <>
+                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                    Accepting...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <MessageSquare className="h-4 w-4" />
+                                                    {isAccepted ? 'Already Accepted' : 'Accept & Chat'}
+                                                </>
+                                            )}
+                                        </Button>
+                                    )}
                                 </>
                             )}
                         </CardContent>
